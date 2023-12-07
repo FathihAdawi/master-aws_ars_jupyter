@@ -26,21 +26,3 @@ import pandas as pd
 # final_end_time = end_time / 60
 # print("--- %s minutes ---" % final_end_time)
 
-import matplotlib.pyplot as plt
-
-def gambar_persegi(sisi):
-    plt.plot([sisi, 0, 0, sisi, sisi], [0, 0, sisi, sisi, 0], 'b-')
-
-def main():
-    n = int(input("Masukkan nilai bilangan bulat n: "))
-
-    plt.figure(figsize=(6, 6))
-
-    for i in range(1, n + 1):
-        gambar_persegi(i)
-    
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.axis('on')
-    plt.show()
-
-main()

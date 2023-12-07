@@ -1,3 +1,4 @@
+# [version: 1.0.5]
 import re
 import requests
 import json
@@ -12,12 +13,12 @@ import time
 pd.set_option("display.max_rows", 100, "display.max_columns", 100)
 
 # [VARIABLES DB]
-#filename = r'D:\ETL_AWS_IOT\db_dwh'
-#section = 'tpadw_db'
-#db_info = db_init(filename, section)
+filename = 'D:\All_app_code\Testing Apps\master-aws_ars_jupyter\db_dwh.ini'
+section = 'tpadw_db'
+db_info = db_init(filename, section)
 
 # [CONNECTION & CURSOR]
-db_connection = psycopg2.connect(dbname='tpadw', user='tpadw.fathih', host='192.168.1.24', password='tpg123!', port=5432)
+db_connection = psycopg2.connect(**db_info)
 db_cursor = db_connection.cursor()
 
 """
@@ -31,19 +32,19 @@ df_m_aws_ars = pd.DataFrame(
 )
 
 list_device_id = list(df_m_aws_ars["DEVICE ID"])
-# list_device_id = ['MTI-163KPI7MDBKL']
+# list_Device_ID = ['MTI-163KPI7MDBKL']
 print("Total DeviceID: "+str(len(list_device_id)))
 start_time = time.time()
 
 def api_retrieved_aws_ars():
 
-    # query_delete_raw = 'delete from "L1_AWS_ARS_RAW" where "FullDate_WIB"::date > current_date - interval \'30 days\' ' \
-    #                     'and "FullDate_WIB"::date <= current_date + interval \'1 day\';'    
-    # db_cursor.execute(query_delete_raw)
+    query_delete_raw = 'delete from "L1_AWS_ARS_RAW" where "FullDate_WIB"::date > current_date - interval \'30 days\' ' \
+                        'and "FullDate_WIB"::date <= current_date + interval \'1 day\';'    
+    db_cursor.execute(query_delete_raw)
 
     while True:
         try:
-            print("=== Retrieved Date IOT AWS ARS ====")
+            print("=== Custom Retrieved Date IOT AWS ARS ====")
             custom_eod = datetime.today().date() + timedelta(days=1)
             custom_sod = custom_eod - timedelta(days=30)
             print("Start_Date: " + str(custom_sod) + "\nEnd_Date: " + str(custom_eod))
@@ -136,9 +137,6 @@ def api_retrieved_aws_ars():
 
                         m_df_aws_ars = pd.concat([df_cols_2, df_aws_ars], axis=1, join='inner')
 
-                        # print(df_aws_ars[['UnixTime', 'FullDate_WIB', 'FullDate_WITA']].loc[pd.to_datetime(df_aws_ars['FullDate_WIB']).dt.normalize() == '2023-12-05'])
-                        # breakpoint()
-
                         m_df_aws_ars[[
                             'Longitude', 'Latitude', 'Battery', 'Signal_Val', 'SolarRad_Val', 'WindDir_Val',
                             'AirHmd_Val',
@@ -156,26 +154,23 @@ def api_retrieved_aws_ars():
                                                        'SolarRad_Val', 'WindDir_Val', 'AirHmd_Val', 'WindSpd_Val',
                                                        'AirPrs_Val', 'PhotoActRad_Val', 'Battery_Val', 'AirTem_Val',
                                                        'RainFal_Val', 'ModifyDateTime']]
-                        
-                        print(m_df_aws_ars_2.info())
-                        breakpoint()
 
-                        # tuple_aws_ars = tuple(map(tuple, m_df_aws_ars_2.values))
+                        tuple_aws_ars = tuple(map(tuple, m_df_aws_ars_2.values))
                         
-                        # query_insert_raw = "insert into \"L1_AWS_ARS_RAW\" (\"DeviceID\", \"DeviceName\", " \
-                        #                    "\"FullDate_WIB\", \"FullDate_WITA\", \"UnixTime\", \"Longitude\", " \
-                        #                    "\"Latitude\", \"Battery\", \"Signal_Val\", \"SolarRad_Val\", " \
-                        #                    "\"WindDir_Val\", \"AirHmd_Val\", \"WindSpd_Val\", \"AirPrs_Val\", " \
-                        #                    "\"PhotoActRad_Val\", \"Battery_Val\", \"AirTem_Val\", " \
-                        #                    "\"RainFal_Val\", \"ModifyDateTime\") " \
-                        #                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
-                        #                    "%s,%s,%s)"
+                        query_insert_raw = "insert into \"L1_AWS_ARS_RAW\" (\"DeviceID\", \"DeviceName\", " \
+                                           "\"FullDate_WIB\", \"FullDate_WITA\", \"UnixTime\", \"Longitude\", " \
+                                           "\"Latitude\", \"Battery\", \"Signal_Val\", \"SolarRad_Val\", " \
+                                           "\"WindDir_Val\", \"AirHmd_Val\", \"WindSpd_Val\", \"AirPrs_Val\", " \
+                                           "\"PhotoActRad_Val\", \"Battery_Val\", \"AirTem_Val\", " \
+                                           "\"RainFal_Val\", \"ModifyDateTime\") " \
+                                           "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
+                                           "%s,%s,%s)"
                         
-                        # db_cursor.executemany(
-                        #     query_insert_raw,
-                        #     tuple_aws_ars
-                        # )
-                        # db_connection.commit()
+                        db_cursor.executemany(
+                            query_insert_raw,
+                            tuple_aws_ars
+                        )
+                        db_connection.commit()
                     else:
                         print("Data is empty in " + d)
                 else:
@@ -187,16 +182,16 @@ def api_retrieved_aws_ars():
 def api_clean_aws_ars():
     
     """
-    Cleaning Data Frame After Input Data Raw
-    :return:
+        Cleaning Data Frame After Input Data Raw
+        :return:
     """
 
-    #[Delete filter from L2_AWS_ARS Table]
+    # [Delete filter from L2_AWS_ARS Table]
     query_delete_clean = 'delete from "L2_AWS_ARS" where "FullDate"::date > current_date - interval \'30 days\' ' \
                         'and "FullDate"::date <= current_date + interval \'1 day\';' 
     db_cursor.execute(query_delete_clean)
 
-    #[Get Data from L1_AWS_ARS_RAW Table]
+    # [Get Data from L1_AWS_ARS_RAW Table]
     query_clean = 'select "DeviceID", "DeviceName", "FullDate_WIB", "FullDate_WITA", "UnixTime", "Longitude", ' \
                 '"Latitude", "Battery", "Signal_Val", "SolarRad_Val", "WindDir_Val", "AirHmd_Val", ' \
                 '"WindSpd_Val", "AirPrs_Val", "PhotoActRad_Val", "Battery_Val", "AirTem_Val", ' \
@@ -211,16 +206,12 @@ def api_clean_aws_ars():
                  "AirPrs_Val", "PhotoActRad_Val", "Battery_Val", "AirTem_Val", "RainFal_Val", "ModifyDateTime"]
     )
 
-    for i, y in df_clean_data[['Signal_Val', 'SolarRad_Val', 'WindDir_Val', 'AirHmd_Val', 'WindSpd_Val', 'AirPrs_Val',
-                               'PhotoActRad_Val', 'Battery_Val', 'AirTem_Val', 'RainFal_Val']].items():
-        df_clean_data[i] = df_clean_data[i].apply(lambda x: None if 'undefined' in x else x)
 
-    for i, y in df_clean_data[['Signal_Val', 'SolarRad_Val', 'WindDir_Val', 'AirHmd_Val', 'WindSpd_Val', 'AirPrs_Val',
-                               'PhotoActRad_Val', 'Battery_Val', 'AirTem_Val', 'RainFal_Val']].items():
-        
+    for i in df_clean_data[['Signal_Val', 'SolarRad_Val', 'WindDir_Val', 'AirHmd_Val', 'WindSpd_Val', 'AirPrs_Val',
+                               'PhotoActRad_Val', 'Battery_Val', 'AirTem_Val', 'RainFal_Val']].columns:
+        df_clean_data[i] = df_clean_data[i].apply(lambda x: None if 'undefined' in x else x)
         df_clean_data[i] = df_clean_data[i].str.extract(r'(\'value\'.+\')')
         df_clean_data[i] = df_clean_data[i].str.replace(r'[\'value\':\s\']', '', regex=True)
-
 
     df_clean_data.rename(
         columns={'ModifyDateTime': 'ModifyDate'},
@@ -241,12 +232,11 @@ def api_clean_aws_ars():
     tuple_clean_aws_ars = tuple(map(tuple, df_clean_data.values))
 
     query_insert_clean_raw = "insert into \"L2_AWS_ARS\" (\"DeviceID\", \"DeviceName\", \"FullDate\", " \
-                             "\"FullDate_WITA\", " \
-                             "\"UnixTime\", \"Longitude\", \"Latitude\", \"Battery\", \"Signal_Val\", " \
-                             "\"SolarRad_Val\", \"WindDir_Val\", \"AirHmd_Val\", \"WindSpd_Val\", \"AirPrs_Val\", " \
-                             "\"PhotoActRad_Val\", \"Battery_Val\", \"AirTem_Val\", \"RainFal_Val\", " \
-                             "\"ModifyStatus\", \"ModifyDate\") VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s," \
-                             "%s,%s,%s,%s,%s)"
+                            "\"FullDate_WITA\", \"UnixTime\", \"Longitude\", \"Latitude\", \"Battery\", "\
+                            "\"Signal_Val\", \"SolarRad_Val\", \"WindDir_Val\", \"AirHmd_Val\", \"WindSpd_Val\", " \
+                            "\"AirPrs_Val\", \"PhotoActRad_Val\", \"Battery_Val\", \"AirTem_Val\", \"RainFal_Val\", " \
+                            "\"ModifyStatus\", \"ModifyDate\") " \
+                            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
     db_cursor.executemany(
         query_insert_clean_raw,
@@ -257,6 +247,11 @@ def api_clean_aws_ars():
     print("Success To Clean!")
 
 def api_refresh_mv_l3():
+
+    """
+        Serve all refresh materialized view for dashboard needs
+        :return:
+    """
     list_mv_l3 = ['refresh materialized view public.mv_l3_iot_aws;', 
                   'refresh materialized view public.mv_l3_aws_unitday;', 
                   'refresh materialized view public.mv_l3_aws_unithour;', 
@@ -271,8 +266,8 @@ def api_refresh_mv_l3():
 
 # [Execute Function RAW and Clean Data]
 api_retrieved_aws_ars()
-# API_clean_aws_ars()
-# API_refresh_mv_l3()
+api_clean_aws_ars()
+api_refresh_mv_l3()
 
 # [Get Runtime Execution Process]
 end_time = time.time() - start_time
