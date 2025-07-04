@@ -14,7 +14,7 @@ pd.set_option("display.max_rows", 100, "display.max_columns", 100)
 
 # [VARIABLES DB]
 filename = 'db_dwh.ini'
-section = 'tpadw_db'
+section = 'db'
 db_info = db_init(filename, section)
 
 # [CONNECTION & CURSOR]
@@ -56,7 +56,7 @@ def API_retrieved_aws_ars():
                     "http://forwarding.mertani.my.id/pull-sensor-record?deviceId=" + d + "&fromDate=" + str(
                         '2023-11-19') + "&endDate"
                                       "=" + str('2023-11-19') + "&zone=0",
-                    headers={"Token": "IOTYDI002456Y202100D110008I44380334T999999P999999P9999999A"}
+                    headers={"Token": "xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx"}
                 )
 
                 data = json.loads(r.text)
@@ -223,7 +223,7 @@ def API_clean_aws_ars():
         # df_clean_data[i] = df_clean_data[i].str.extract(r'(\d\D+)$')
         df_clean_data[i] = df_clean_data[i].str.extract(r'(\'value\'.+\')')
 
-        df_clean_data[i] = df_clean_data[i].
+        # df_clean_data[i] = df_clean_data[i].str.extract(r'(^\d)')
 
     # if check_Undefined_Val.str.cont == True:
     #     print('There is undefined values!')

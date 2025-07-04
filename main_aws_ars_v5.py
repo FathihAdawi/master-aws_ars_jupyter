@@ -56,7 +56,7 @@ def api_retrieved_aws_ars():
                     "http://forwarding.mertani.my.id/pull-sensor-record?deviceId=" + d + "&fromDate=" + str(
                         str(custom_sod)) + "&endDate"
                                       "=" + str(custom_eod) + "&zone=0",
-                    headers={"Token": "IOTYDI002456Y202100D110008I44380334T999999P999999P9999999A"}
+                    headers={"Token": "xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx"}
                 )
 
                 data = json.loads(r.text)

@@ -17,7 +17,7 @@ pd.set_option("display.max_rows", 100, "display.max_columns", 100)
 #db_info = db_init(filename, section)
 
 # [CONNECTION & CURSOR]
-db_connection = psycopg2.connect(dbname='tpadw', user='tpadw.fathih', host='192.168.1.24', password='tpg123!', port=5432)
+db_connection = psycopg2.connect()
 db_cursor = db_connection.cursor()
 
 """
@@ -55,7 +55,7 @@ def api_retrieved_aws_ars():
                     "http://forwarding.mertani.my.id/pull-sensor-record?deviceId=" + d + "&fromDate=" + str(
                         str(custom_sod)) + "&endDate"
                                       "=" + str(custom_eod) + "&zone=0",
-                    headers={"Token": "IOTYDI002456Y202100D110008I44380334T999999P999999P9999999A"}
+                    headers={"Token": "xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx"}
                 )
 
                 data = json.loads(r.text)

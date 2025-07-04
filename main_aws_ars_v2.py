@@ -14,7 +14,7 @@ pd.set_option("display.max_rows", 100, "display.max_columns", 100)
 
 # [VARIABLES DB]
 filename = 'db_dwh.ini'
-section = 'tpadw_db'
+section = 'db'
 db_info = db_init(filename, section)
 
 # [CONNECTION & CURSOR]
@@ -54,7 +54,7 @@ def API_retrieved_aws_ars():
                     "http://forwarding.mertani.my.id/pull-sensor-record?deviceId=" + d + "&fromDate=" + str(
                         str(custom_SOD)) + "&endDate"
                                       "=" + str(custom_EOD) + "&zone=0",
-                    headers={"Token": "IOTYDI002456Y202100D110008I44380334T999999P999999P9999999A"}
+                    headers={"Token": "xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx"}
                 )
 
                 data = json.loads(r.text)
